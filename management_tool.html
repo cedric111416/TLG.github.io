@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Management Tool</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f8f4;
+      color: #1d2b1f;
+    }
+
+    header {
+      background: #2f6b3b;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      background: #214d2a;
+      padding: 10px;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    section {
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    input, select, textarea, button {
+      padding: 10px;
+      margin-top: 5px;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-family: inherit;
+    }
+
+    button {
+      background: #2f6b3b;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #214d2a;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 5px;
+      font-size: 12px;
+    }
+
+    .hoch { background: #ffcccc; }
+    .mittel { background: #fff3cd; }
+    .tief { background: #d4edda; }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Management Tool</h1>
+</header>
+
+<nav>
+  <a href="#uebersicht">Übersicht</a>
+  <a href="#personal">Personal</a>
+  <a href="#kalender">Kalender</a>
+  <a href="#kontakt">Kontakt</a>
+</nav>
+
+<section id="uebersicht">
+  <h2>Übersicht</h2>
+  <div class="card">
+    <p>Behalte alle wichtigen Informationen im Überblick.</p>
+    <p><strong>Pendenzen:</strong> <span id="tasksCount">0</span></p>
+    <p><strong>Personal:</strong> <span id="personnelCount">0</span></p>
+  </div>
+</section>
+
+<section id="personal">
+  <h2>Personal</h2>
+
+  <div class="card">
+    <h3>Neues Personal</h3>
+    <form id="personForm">
+      <input type="text" id="name" placeholder="Name" required>
+      <input type="text" id="role" placeholder="Funktion" required>
+
+      <select id="status">
+        <option>Verfügbar</option>
+        <option>Im Einsatz</option>
+        <option>Abwesend</option>
+      </select>
+
+      <input type="text" id="material" placeholder="Material">
+      <button type="submit">Hinzufügen</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>Liste</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Funktion</th>
+          <th>Status</th>
+          <th>Material</th>
+        </tr>
+      </thead>
+      <tbody id="personList"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="kalender">
+  <h2>Kalender & Prioritäten</h2>
+
+  <div class="card">
+    <h3>Neue Aufgabe</h3>
+    <form id="taskForm">
+      <input type="text" id="task" placeholder="Aufgabe" required>
+
+      <select id="priority">
+        <option value="hoch">Hoch</option>
+        <option value="mittel">Mittel</option>
+        <option value="tief">Tief</option>
+      </select>
+
+      <button type="submit">Hinzufügen</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>Pendenzen</h3>
+    <ul id="taskList"></ul>
+  </div>
+</section>
+
+<section id="kontakt">
+  <h2>Kontakt</h2>
+
+  <div class="card">
+    <form onsubmit="event.preventDefault(); alert('Gesendet!')">
+      <input type="text" placeholder="Name" required>
+      <input type="email" placeholder="E-Mail" required>
+      <textarea placeholder="Nachricht"></textarea>
+      <button type="submit">Senden</button>
+    </form>
+  </div>
+</section>
+
+<script>
+let personnel = [];
+let tasks = [];
+
+const personForm = document.getElementById("personForm");
+const personList = document.getElementById("personList");
+
+personForm.addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const person = {
+    name: name.value,
+    role: role.value,
+    status: status.value,
+    material: material.value
+  };
+
+  personnel.push(person);
+  renderPersonnel();
+  personForm.reset();
+});
+
+function renderPersonnel() {
+  personList.innerHTML = "";
+  personnel.forEach(p => {
+    personList.innerHTML += `
+      <tr>
+        <td>${p.name}</td>
+        <td>${p.role}</td>
+        <td>${p.status}</td>
+        <td>${p.material}</td>
+      </tr>
+    `;
+  });
+
+  document.getElementById("personnelCount").innerText = personnel.length;
+}
+
+const taskForm = document.getElementById("taskForm");
+const taskList = document.getElementById("taskList");
+
+taskForm.addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const task = {
+    text: task.value,
+    priority: priority.value
+  };
+
+  tasks.push(task);
+  renderTasks();
+  taskForm.reset();
+});
+
+function renderTasks() {
+  taskList.innerHTML = "";
+  tasks.forEach(t => {
+    taskList.innerHTML += `
+      <li>
+        ${t.text} 
+        <span class="badge ${t.priority}">${t.priority}</span>
+      </li>
+    `;
+  });
+
+  document.getElementById("tasksCount").innerText = tasks.length;
+}
+</script>
+
+</body>
+</html>
